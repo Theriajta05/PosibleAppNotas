@@ -4,23 +4,53 @@ package com.example.inventory.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.inventory.ui.notes.NotesScreen
 import com.example.inventory.ui.notes.NoteEntryScreen
-import com.example.inventory.ui.notes.NotesDestination
+import com.example.inventory.ui.notes.NoteDetailsScreen
+import com.example.inventory.R
+
+// Objeto para definir la ruta a la pantalla de detalles de una nota
+object NoteDetailsDestination : NavigationDestination {
+    override val route = "note_details/{noteId}"
+    override val titleRes: Int = R.string.note_detail_title
+
+    const val noteIdArg = "noteId"
+
+    fun createRoute(noteId: Int): String = "note_details/$noteId"
+}
 
 @Composable
-fun InventoryNavHost(navController: NavHostController) {
-    NavHost(navController, startDestination = NotesDestination.route) {
-        composable(NotesDestination.route) {
+fun InventoryNavHost(
+    navController: NavHostController,
+    startDestination: String = "notes"
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable("notes") {
             NotesScreen(
                 navigateToNoteEntry = { navController.navigate("note_entry") },
-                navigateToNoteDetail = { id -> navController.navigate("note_detail/$id") }
+                navigateToNoteDetail = { noteId ->
+                    navController.navigate(NoteDetailsDestination.createRoute(noteId))
+                }
             )
         }
         composable("note_entry") {
             NoteEntryScreen(navigateBack = { navController.popBackStack() })
+        }
+        composable(
+            route = NoteDetailsDestination.route,
+            arguments = listOf(navArgument(NoteDetailsDestination.noteIdArg) {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+            val noteId = backStackEntry.arguments?.getInt(NoteDetailsDestination.noteIdArg) ?: 0
+            NoteDetailsScreen(noteId = noteId, navigateBack = { navController.popBackStack() })
         }
     }
 }

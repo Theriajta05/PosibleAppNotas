@@ -16,28 +16,33 @@
 
 package com.example.inventory.ui.item
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.inventory.data.NotesRepository
 
-/**
- * ViewModel to retrieve, update and delete an item from the [NotesRepository]'s data source.
- */
-class ItemDetailsViewModel(
-    savedStateHandle: SavedStateHandle
+class NoteDetailsViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val notesRepository: NotesRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[ItemDetailsDestination.itemIdArg])
+    private val noteId: Int = checkNotNull(savedStateHandle[NoteDetailsDestination.noteIdArg])
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+    private val _noteDetails = MutableStateFlow<Note?>(null)
+    val noteDetails: StateFlow<Note?> = _noteDetails
+
+    init {
+        loadNote()
+    }
+
+    private fun loadNote() {
+        viewModelScope.launch {
+            notesRepository.getNoteStream(noteId).collect { note ->
+                _noteDetails.value = note
+            }
+        }
     }
 }
 
-/**
- * UI state for ItemDetailsScreen
- */
-data class ItemDetailsUiState(
-    val outOfStock: Boolean = true,
-    val itemDetails: ItemDetails = ItemDetails()
-)

@@ -24,4 +24,6 @@
     <string name="note_title">Título</string>
     <string name="note_content">Contenido</string>
     <string name="save_note">Guardar Nota</string>
+    <string name="note_detail_title">Note Details</string>
+    <string name="note_not_found">Note not found</string>
 </resources>
