@@ -1,36 +1,48 @@
-// Ubicación: com.example.inventory.ui.notes
+package com.example.inventory.ui.item
 
-package com.example.inventory.ui.notes
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.inventory.data.Note
 import com.example.inventory.data.NotesRepository
-import kotlinx.coroutines.launch
 
-class NoteEntryViewModel(private val notesRepository: NotesRepository) : ViewModel() {
+class NoteEntryViewModel(
+    private val notesRepository: NotesRepository
+) : ViewModel() {
+
     var noteUiState by mutableStateOf(NoteUiState())
         private set
 
     fun updateTitle(newTitle: String) {
-        noteUiState = noteUiState.copy(title = newTitle)
+        val updatedNoteDetails = noteUiState.noteDetails.copy(title = newTitle)
+        updateUiState(updatedNoteDetails)
     }
 
     fun updateContent(newContent: String) {
-        noteUiState = noteUiState.copy(content = newContent)
+        val updatedNoteDetails = noteUiState.noteDetails.copy(content = newContent)
+        updateUiState(updatedNoteDetails)
+    }
+
+    private fun updateUiState(noteDetails: NoteDetails) {
+        noteUiState = NoteUiState(noteDetails = noteDetails, isEntryValid = validateInput(noteDetails))
+    }
+
+    private fun validateInput(uiState: NoteDetails): Boolean {
+        return uiState.title.isNotBlank() && uiState.content.isNotBlank()
     }
 
     fun saveNote() {
-        viewModelScope.launch {
-            notesRepository.insertNote(Note(
-                title = noteUiState.title,
-                content = noteUiState.content
-            ))
-        }
+        // Lógica para guardar la nota en el repositorio
     }
 }
 
 data class NoteUiState(
+    val noteDetails: NoteDetails = NoteDetails(),
+    val isEntryValid: Boolean = false
+)
+
+data class NoteDetails(
+    val id: Int = 0,
     val title: String = "",
     val content: String = ""
 )

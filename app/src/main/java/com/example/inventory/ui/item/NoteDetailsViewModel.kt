@@ -7,14 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inventory.data.Note
 import com.example.inventory.data.NotesRepository
-import kotlinx.coroutines.flow.Flow
+import com.example.inventory.ui.navigation.NoteDetailsDestination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel to retrieve, update, and delete a note from the [NotesRepository]'s data source.
- */
 class NoteDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val notesRepository: NotesRepository
@@ -26,12 +23,12 @@ class NoteDetailsViewModel(
     val noteDetails: StateFlow<Note?> = _noteDetails
 
     init {
-        getNoteById(noteId)
+        loadNote()
     }
 
-    private fun getNoteById(id: Int) {
+    private fun loadNote() {
         viewModelScope.launch {
-            notesRepository.getNoteStream(id).collect { note ->
+            notesRepository.getNoteStream(noteId).collect { note ->
                 _noteDetails.value = note
             }
         }

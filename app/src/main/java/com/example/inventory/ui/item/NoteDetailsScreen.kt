@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.data.Note
 import com.example.inventory.ui.AppViewModelProvider
@@ -32,25 +33,28 @@ fun NoteDetailsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.note_detail_title)) },
-                navigationIcon = {
-                    IconButton(onClick = navigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
+            InventoryTopAppBar(
+                title = stringResource(R.string.note_detail_title),
+                canNavigateBack = true,
+                navigateUp = navigateBack
             )
         },
-        content = {
-            note?.let {
-                NoteDetails(
-                    note = it,
-                    modifier = modifier.padding(it)
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                note?.let {
+                    NoteDetails(
+                        note = it,
+                        modifier = modifier.padding(16.dp)
+                    )
+                } ?: Text(
+                    text = stringResource(R.string.note_not_found),
+                    modifier = Modifier.padding(16.dp)
                 )
-            } ?: Text(
-                text = stringResource(R.string.note_not_found),
-                modifier = Modifier.padding(16.dp)
-            )
+            }
         }
     )
 }

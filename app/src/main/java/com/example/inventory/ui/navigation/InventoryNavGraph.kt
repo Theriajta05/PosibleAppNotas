@@ -9,19 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.inventory.ui.notes.NotesScreen
-import com.example.inventory.ui.notes.NoteEntryScreen
 import com.example.inventory.ui.notes.NoteDetailsScreen
-import com.example.inventory.R
 
-// Objeto para definir la ruta a la pantalla de detalles de una nota
-object NoteDetailsDestination : NavigationDestination {
-    override val route = "note_details/{noteId}"
-    override val titleRes: Int = R.string.note_detail_title
-
-    const val noteIdArg = "noteId"
-
-    fun createRoute(noteId: Int): String = "note_details/$noteId"
-}
 
 @Composable
 fun InventoryNavHost(
@@ -39,9 +28,6 @@ fun InventoryNavHost(
                     navController.navigate(NoteDetailsDestination.createRoute(noteId))
                 }
             )
-        }
-        composable("note_entry") {
-            NoteEntryScreen(navigateBack = { navController.popBackStack() })
         }
         composable(
             route = NoteDetailsDestination.route,
