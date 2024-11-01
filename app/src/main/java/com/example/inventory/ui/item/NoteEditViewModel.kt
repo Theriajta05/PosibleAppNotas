@@ -13,6 +13,7 @@ class NoteEditViewModel(
     var noteUiState by mutableStateOf(NoteUiState())
         private set
 
+
     fun updateTitle(newTitle: String) {
         noteUiState = noteUiState.copy(
             noteDetails = noteUiState.noteDetails.copy(title = newTitle)

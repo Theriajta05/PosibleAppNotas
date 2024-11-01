@@ -17,11 +17,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.ui.AppViewModelProvider
+import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
+
+
+object NoteEntryDestination: NavigationDestination{
+    override val route = "note_entry"
+    override val titleRes = R.string.note_entry_title
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEntryScreen(
+    onNavigateUp:()-> Unit,
     navigateBack: () -> Unit,
     viewModel: NoteEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -53,10 +61,3 @@ fun NoteEntryScreen(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun NoteEntryScreenPreview() {
-    InventoryTheme {
-        NoteEntryScreen(navigateBack = { /*Do nothing*/ })
-    }
-}

@@ -8,6 +8,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.inventory.ui.item.NoteEntryDestination
+import com.example.inventory.ui.item.NoteEntryScreen
 import com.example.inventory.ui.notes.NotesScreen
 import com.example.inventory.ui.notes.NoteDetailsScreen
 
@@ -23,11 +25,15 @@ fun InventoryNavHost(
     ) {
         composable("notes") {
             NotesScreen(
-                navigateToNoteEntry = { navController.navigate("note_entry") },
+                navigateToNoteEntry = { navController.navigate(NoteEntryDestination.route) },
                 navigateToNoteDetail = { noteId ->
                     navController.navigate(NoteDetailsDestination.createRoute(noteId))
                 }
             )
+        }
+        composable(route = NoteEntryDestination.route){
+            NoteEntryScreen(navigateBack = {navController.popBackStack()},
+                onNavigateUp = {navController.navigateUp()})
         }
         composable(
             route = NoteDetailsDestination.route,

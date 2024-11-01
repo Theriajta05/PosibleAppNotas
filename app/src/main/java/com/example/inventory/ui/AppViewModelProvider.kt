@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.inventory.InventoryApplication
 import com.example.inventory.ui.item.NoteEntryViewModel
 import com.example.inventory.ui.item.NoteEditViewModel
+import com.example.inventory.ui.notes.NotesViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -22,6 +23,11 @@ object AppViewModelProvider {
         // Inicializar NoteEditViewModel
         initializer {
             NoteEditViewModel(
+                notesRepository = inventoryApplication().container.notesRepository
+            )
+        }
+        initializer {
+            NotesViewModel(
                 notesRepository = inventoryApplication().container.notesRepository
             )
         }
