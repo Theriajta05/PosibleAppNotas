@@ -16,13 +16,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.ui.AppViewModelProvider
-import androidx.compose.ui.unit.dp // Importación de dp
+import com.example.inventory.ui.theme.InventoryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditScreen(
     navigateBack: () -> Unit,
-    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NoteEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -31,7 +30,7 @@ fun NoteEditScreen(
             InventoryTopAppBar(
                 title = stringResource(R.string.note_edit_title),
                 canNavigateBack = true,
-                navigateUp = onNavigateUp
+                navigateUp = navigateBack
             )
         },
         modifier = modifier
@@ -40,7 +39,10 @@ fun NoteEditScreen(
             noteUiState = viewModel.noteUiState,
             onTitleChange = viewModel::updateTitle,
             onContentChange = viewModel::updateContent,
-            onSaveClick = { /* Implementación de la función de guardado */ },
+            onSaveClick = {
+                viewModel.saveNote()
+                navigateBack()
+            },
             modifier = Modifier
                 .padding(
                     start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
@@ -55,5 +57,7 @@ fun NoteEditScreen(
 @Preview(showBackground = true)
 @Composable
 fun NoteEditScreenPreview() {
-    NoteEditScreen(navigateBack = { /*Do nothing*/ }, onNavigateUp = { /*Do nothing*/ })
+    InventoryTheme {
+        NoteEditScreen(navigateBack = { /*Do nothing*/ })
+    }
 }

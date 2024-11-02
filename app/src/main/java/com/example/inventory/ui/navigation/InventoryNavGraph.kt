@@ -8,11 +8,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.inventory.ui.item.NoteEntryDestination
+import com.example.inventory.ui.notes.NoteDetailsScreen
 import com.example.inventory.ui.item.NoteEntryScreen
 import com.example.inventory.ui.notes.NotesScreen
-import com.example.inventory.ui.notes.NoteDetailsScreen
-
 
 @Composable
 fun InventoryNavHost(
@@ -25,23 +23,24 @@ fun InventoryNavHost(
     ) {
         composable("notes") {
             NotesScreen(
-                navigateToNoteEntry = { navController.navigate(NoteEntryDestination.route) },
+                navigateToNoteEntry = { navController.navigate("note_entry") },
                 navigateToNoteDetail = { noteId ->
-                    navController.navigate(NoteDetailsDestination.createRoute(noteId))
+                    navController.navigate("note_details/$noteId")
                 }
             )
         }
-        composable(route = NoteEntryDestination.route){
-            NoteEntryScreen(navigateBack = {navController.popBackStack()},
-                onNavigateUp = {navController.navigateUp()})
+
+        composable(route = "note_entry") {
+            NoteEntryScreen(
+                navigateBack = { navController.popBackStack() }
+            )
         }
+
         composable(
-            route = NoteDetailsDestination.route,
-            arguments = listOf(navArgument(NoteDetailsDestination.noteIdArg) {
-                type = NavType.IntType
-            })
+            route = "note_details/{noteId}",
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val noteId = backStackEntry.arguments?.getInt(NoteDetailsDestination.noteIdArg) ?: 0
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
             NoteDetailsScreen(noteId = noteId, navigateBack = { navController.popBackStack() })
         }
     }
