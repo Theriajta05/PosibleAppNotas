@@ -21,6 +21,7 @@ import com.example.inventory.ui.theme.InventoryTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditScreen(
+    noteId: Int,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NoteEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -54,10 +55,4 @@ fun NoteEditScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun NoteEditScreenPreview() {
-    InventoryTheme {
-        NoteEditScreen(navigateBack = { /*Do nothing*/ })
-    }
-}
+

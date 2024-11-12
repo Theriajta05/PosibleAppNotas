@@ -35,10 +35,9 @@ object AppViewModelProvider {
         }
         // Inicializar NoteDetailsViewModel con SavedStateHandle
         initializer {
-            val savedStateHandle = this.createSavedStateHandle()  // Obtiene el SavedStateHandle
             NoteDetailsViewModel(
                 notesRepository = inventoryApplication().container.notesRepository,
-                savedStateHandle = savedStateHandle
+                savedStateHandle = createSavedStateHandle() // Llamada sin contexto explícito
             )
         }
     }

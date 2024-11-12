@@ -8,6 +8,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.example.inventory.ui.item.NoteEditScreen
 import com.example.inventory.ui.notes.NoteDetailsScreen
 import com.example.inventory.ui.item.NoteEntryScreen
 import com.example.inventory.ui.notes.NotesScreen
@@ -41,7 +43,22 @@ fun InventoryNavHost(
             arguments = listOf(navArgument("noteId") { type = NavType.IntType })
         ) { backStackEntry ->
             val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
-            NoteDetailsScreen(noteId = noteId, navigateBack = { navController.popBackStack() })
+            NoteDetailsScreen(
+                noteId = noteId,
+                navigateBack = { navController.popBackStack() },
+                navigateToEditNote = { id -> navController.navigate("edit_note/$id") }
+            )
+        }
+
+        composable(
+            route = "edit_note/{noteId}",
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
+            NoteEditScreen(
+                noteId = noteId,
+                navigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
