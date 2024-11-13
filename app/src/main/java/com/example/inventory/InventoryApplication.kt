@@ -31,6 +31,4 @@ class InventoryApplication : Application() {
         super.onCreate()
         container = AppDataContainer(this)
     }
-
-
 }

@@ -1,5 +1,3 @@
-// Ubicación: com.example.inventory.ui.notes
-
 package com.example.inventory.ui.notes
 
 import androidx.compose.foundation.clickable

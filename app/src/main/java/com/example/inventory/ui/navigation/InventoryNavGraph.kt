@@ -1,5 +1,3 @@
-// Ubicación: com.example.inventory.ui.navigation
-
 package com.example.inventory.ui.navigation
 
 import androidx.compose.runtime.Composable

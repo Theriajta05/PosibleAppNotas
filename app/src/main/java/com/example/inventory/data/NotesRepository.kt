@@ -1,5 +1,3 @@
-// Ubicación: com.example.inventory.data
-
 package com.example.inventory.data
 
 import kotlinx.coroutines.flow.Flow
