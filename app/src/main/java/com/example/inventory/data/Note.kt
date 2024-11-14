@@ -16,7 +16,8 @@ import kotlinx.coroutines.flow.Flow
  */
 @Entity(tableName = "notes")
 data class Note(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val title: String,           // Título de la nota
     val content: String          // Contenido de la nota
 )

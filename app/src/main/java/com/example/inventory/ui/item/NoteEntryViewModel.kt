@@ -32,6 +32,8 @@ class NoteEntryViewModel(
         )
     }
 
+
+
     private fun validateInput(title: String, content: String): Boolean {
         return title.isNotBlank() && content.isNotBlank()
     }
