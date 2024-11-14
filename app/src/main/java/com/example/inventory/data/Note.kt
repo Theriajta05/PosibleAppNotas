@@ -1,5 +1,4 @@
-// Ubicación: com.example.inventory.data
-
+// Note.kt
 package com.example.inventory.data
 
 import androidx.room.Dao
@@ -11,15 +10,14 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Entity data class represents a single note in the database.
- */
 @Entity(tableName = "notes")
 data class Note(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String,           // Título de la nota
-    val content: String          // Contenido de la nota
+    val title: String,          // Título de la nota
+    val content: String,        // Contenido de la nota
+    val fecha: Long = 0L,       // Fecha en formato timestamp
+    val hora: Long = 0L         // Hora en formato timestamp
 )
 
 @Dao

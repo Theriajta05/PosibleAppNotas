@@ -1,3 +1,4 @@
+// File: NotesScreen.kt
 package com.example.inventory.ui.notes
 
 import androidx.compose.foundation.clickable
@@ -18,7 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.R
 import com.example.inventory.data.Note
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.navigation.NavigationDestination  // Asegúrate de que esté disponible
+import com.example.inventory.ui.navigation.NavigationDestination
+import java.text.SimpleDateFormat
+import java.util.*
 
 object NotesDestination : NavigationDestination {
     override val route = "notes"
@@ -75,6 +78,10 @@ private fun NoteItem(
     note: Note,
     onClick: () -> Unit
 ) {
+    // Formateadores de fecha y hora
+    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,6 +95,16 @@ private fun NoteItem(
             Text(text = note.title, style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = note.content, style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            // Mostrar la fecha y hora formateadas
+            Text(
+                text = "Fecha: ${dateFormatter.format(Date(note.fecha))}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Hora: ${timeFormatter.format(Date(note.hora))}",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }
