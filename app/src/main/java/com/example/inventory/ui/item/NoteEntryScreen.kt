@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
@@ -145,8 +146,8 @@ fun NoteEntryScreen(
                 }
 
 
-                // Agregar botón de calendario
-                IconButton(
+                // Botón de calendario
+                Button(
                     onClick = {
                         // Acción para abrir el calendario
                         showDatePicker = true
@@ -156,20 +157,23 @@ fun NoteEntryScreen(
                         .align(Alignment.CenterHorizontally)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.DateRange,  // Ícono de calendario
+                        imageVector = Icons.Default.DateRange, // Ícono de calendario
                         contentDescription = "Abrir calendario",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
+                    Text("Seleccionar Fecha")
                 }
-                // Mostrar la fecha seleccionada
+
+// Mostrar la fecha seleccionada
                 Text(
                     text = "Fecha seleccionada: ${selectedDate.value}",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 16.dp)
                 )
 
-                // Agregar botón de reloj
-                IconButton(
+                // Botón de reloj
+                Button(
                     onClick = {
                         // Acción para abrir el reloj
                         showTimePicker = true
@@ -179,11 +183,14 @@ fun NoteEntryScreen(
                         .align(Alignment.CenterHorizontally)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AddCircle,  // Ícono de reloj
+                        imageVector = Icons.Default.AccountCircle, // Ícono de reloj
                         contentDescription = "Abrir reloj",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
+                    Text("Seleccionar Hora")
                 }
+
 
                 // Mostrar la hora seleccionada
                 Text(
