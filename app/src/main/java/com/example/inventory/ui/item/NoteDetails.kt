@@ -4,7 +4,9 @@ import com.example.inventory.data.Note
 data class NoteDetails(
     val id: Int = 0,
     val title: String = "",
-    val content: String = ""
+    val content: String = "",
+    val multimediaUris: List<String> = listOf() // Nuevo campo para URIs
+
 ){
     // Método para verificar si la entrada es válida
     fun isEntryValid(): Boolean {

@@ -46,4 +46,13 @@ class NoteEntryViewModel(
             }
         }
     }
+
+    // Función para actualizar las URIs multimedia
+    fun updateMultimediaUris(uris: List<String>) {
+        _noteUiState.value = _noteUiState.value.copy(
+            noteDetails = _noteUiState.value.noteDetails?.copy(
+                multimediaUris = uris
+            )
+        )
+    }
 }
