@@ -15,7 +15,6 @@ import com.example.inventory.ui.notes.NotesViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
-        // Inicializar NoteEntryViewModel
         initializer {
             NoteEntryViewModel(
                 notesRepository = inventoryApplication().container.notesRepository

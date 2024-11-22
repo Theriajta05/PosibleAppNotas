@@ -3,30 +3,15 @@ package com.example.inventory.ui.item
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,12 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
@@ -49,7 +31,10 @@ import com.ad_coding.noteappcourse.componentes.MultimediaPicker
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.theme.InventoryTheme
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,21 +44,14 @@ fun NoteEntryScreen(
 ) {
     val noteUiState by viewModel.noteUiState.collectAsState()
     var showDatePicker by remember { mutableStateOf(false) }
-    val selectedDate = remember { mutableStateOf("") }  // Declara la variable para la fecha seleccionada
-
-    var showTimePicker by remember { mutableStateOf(false) }  // Nueva variable para mostrar el reloj
-    val selectedTime = remember { mutableStateOf("") }  // Hora seleccionada
-
-    var showMultimediaPicker by remember { mutableStateOf(false) } // Mostrar el MultimediaPicker
-    val multimediaUris = remember { mutableStateOf<List<String>>(listOf()) } // Almacenar las URIs seleccionadas
-
-    var showAudioRecorder by remember { mutableStateOf(false) }  // Control para mostrar el grabador de audio
-    var showCameraButton by remember { mutableStateOf(false) } // Control para mostrar la cámara
+    var showTimePicker by remember { mutableStateOf(false) }
+    var showMultimediaPicker by remember { mutableStateOf(false) }
+    var multimediaUris by remember { mutableStateOf<List<String>>(listOf()) }
 
     Scaffold(
         topBar = {
             InventoryTopAppBar(
-                title = stringResource(R.string.note_entry_title),
+                title = "Add Note",
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -84,146 +62,92 @@ fun NoteEntryScreen(
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
             ) {
+                // Title Input
                 OutlinedTextField(
-                    value = noteUiState.noteDetails?.title ?: "", // Manejo de nulos
-                    onValueChange = { newTitle: String -> viewModel.updateTitle(newTitle) },
+                    value = noteUiState.noteDetails?.title.orEmpty(), // Manejo de valores nulos
+                    onValueChange = { viewModel.updateTitle(it) },
                     label = { Text("Title") },
-                    modifier = Modifier.padding(16.dp)
-                )
-                OutlinedTextField(
-                    value = noteUiState.noteDetails?.content ?: "", // Manejo de nulos
-                    onValueChange = { newContent: String -> viewModel.updateContent(newContent) },
-                    label = { Text("Content") },
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
                 )
 
-                // Botón para abrir la cámara
+                // Content Input
+                OutlinedTextField(
+                    value = noteUiState.noteDetails?.content.orEmpty(), // Manejo de valores nulos
+                    onValueChange = { viewModel.updateContent(it) },
+                    label = { Text("Content") },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+
+                // Select Date
                 Button(
-                    onClick = {
-                        showCameraButton = true
-                    },
+                    onClick = { showDatePicker = true },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBox,
-                        contentDescription = "Abrir cámara",
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Abrir Cámara")
+                    Text("Select Date")
                 }
-                // Botón para abrir el MultimediaPicker
+                Text(
+                    text = "Selected Date: ${
+                        noteUiState.noteDetails?.fecha?.takeIf { it != 0L }?.let {
+                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
+                        } ?: "Not selected"
+                    }",
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+
+                // Select Time
+                Button(
+                    onClick = { showTimePicker = true },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("Select Time")
+                }
+                Text(
+                    text = "Selected Time: ${
+                        noteUiState.noteDetails?.hora?.takeIf { it != 0L }?.let {
+                            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(it))
+                        } ?: "Not selected"
+                    }",
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+
+                // Add Multimedia
                 Button(
                     onClick = { showMultimediaPicker = true },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MailOutline,
-                        contentDescription = "Abrir selector de multimedia"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Añadir Multimedia")
+                    Text("Add Multimedia")
                 }
-
-                // Mostrar la lista de multimedia seleccionada
                 LazyColumn(
                     modifier = Modifier
-                        .height(150.dp)
                         .padding(horizontal = 16.dp)
+                        .height(150.dp)
                 ) {
-                    items(multimediaUris.value) { uri ->
+                    items(multimediaUris) { uri ->
                         Image(
                             painter = rememberAsyncImagePainter(model = Uri.parse(uri)),
                             contentDescription = null,
                             modifier = Modifier
+                                .padding(8.dp)
                                 .width(100.dp)
                                 .height(150.dp)
-                                .padding(8.dp)
                         )
                     }
                 }
 
-
-                // Botón de calendario
-                Button(
-                    onClick = {
-                        // Acción para abrir el calendario
-                        showDatePicker = true
-                    },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange, // Ícono de calendario
-                        contentDescription = "Abrir calendario",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text("Seleccionar Fecha")
-                }
-
-// Mostrar la fecha seleccionada
-                Text(
-                    text = "Fecha seleccionada: ${selectedDate.value}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
-                // Botón de reloj
-                Button(
-                    onClick = {
-                        // Acción para abrir el reloj
-                        showTimePicker = true
-                    },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle, // Ícono de reloj
-                        contentDescription = "Abrir reloj",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text("Seleccionar Hora")
-                }
-
-
-                // Mostrar la hora seleccionada
-                Text(
-                    text = "Hora seleccionada: ${selectedTime.value}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
-                // Nuevo botón para abrir el grabador de audio
-                Button(
-                    onClick = {
-                        showAudioRecorder = true
-                    },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Abrir grabador de audio",
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Abrir Grabador de Audio")
-                }
-
-
-
+                // Save Button
                 Button(
                     onClick = {
                         viewModel.saveNote()
                         navigateBack()
                     },
-                    enabled = noteUiState.noteDetails?.isEntryValid() == true, // Validar entrada
-                    modifier = Modifier.padding(16.dp)
+                    enabled = noteUiState.isEntryValid,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
                 ) {
                     Text("Save Note")
                 }
@@ -231,118 +155,57 @@ fun NoteEntryScreen(
         }
     )
 
-    if (showCameraButton) {
-        AlertDialog(
-            onDismissRequest = { showCameraButton = false },
-            title = { Text("Cámara") },
-            text = {
-                Column {
-                    Text("Toma fotos usando el botón de la cámara.")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CameraButton()
-                }
-            },
-            confirmButton = {
-                Button(onClick = { showCameraButton = false }) {
-                    Text("Cerrar")
-                }
-            }
-        )
-    }
-
-
-
-    if (showAudioRecorder) {
-        AlertDialog(
-            onDismissRequest = { showAudioRecorder = false },
-            title = { Text("Grabador de Audio") },
-            text = {
-                Column {
-                    Text("Usa los botones para grabar o reproducir audio.")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AudioRecorderButton()
-                }
-            },
-            confirmButton = {
-                Button(onClick = { showAudioRecorder = false }) {
-                    Text("Cerrar")
-                }
-            }
-        )
-    }
-
-
-    // Mostrar el DatePickerDialog cuando showDatePicker es verdadero
+    // Date Picker Dialog
     if (showDatePicker) {
         val context = LocalContext.current
-        val currentDate = java.util.Calendar.getInstance()
-        val year = currentDate.get(java.util.Calendar.YEAR)
-        val month = currentDate.get(java.util.Calendar.MONTH)
-        val day = currentDate.get(java.util.Calendar.DAY_OF_MONTH)
-
+        val calendar = Calendar.getInstance()
         DatePickerDialog(
             context,
-            { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                val formattedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
-
-                // Actualizar la variable selectedDate
-                selectedDate.value = formattedDate
-
-                // Mostrar un mensaje con la fecha seleccionada
-                Toast.makeText(context, "Fecha seleccionada: $formattedDate", Toast.LENGTH_SHORT).show()
-
-                // Cerrar el diálogo
+            { _, year, month, day ->
+                calendar.set(year, month, day)
+                viewModel.updateFecha(calendar.timeInMillis)
                 showDatePicker = false
             },
-            year,
-            month,
-            day
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
     }
-    // Mostrar el TimePickerDialog cuando showTimePicker es verdadero
+
+    // Time Picker Dialog
     if (showTimePicker) {
         val context = LocalContext.current
-        val currentTime = java.util.Calendar.getInstance()
-        val hour = currentTime.get(java.util.Calendar.HOUR_OF_DAY)
-        val minute = currentTime.get(java.util.Calendar.MINUTE)
-
+        val calendar = Calendar.getInstance()
         TimePickerDialog(
             context,
-            { _, selectedHour, selectedMinute ->
-                val formattedTime = "$selectedHour:${String.format("%02d", selectedMinute)}"
-
-                // Actualizar la variable selectedTime
-                selectedTime.value = formattedTime
-
-                // Mostrar un mensaje con la hora seleccionada
-                Toast.makeText(context, "Hora seleccionada: $formattedTime", Toast.LENGTH_SHORT).show()
-
-                // Cerrar el diálogo
+            { _, hour, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, minute)
+                viewModel.updateHora(calendar.timeInMillis)
                 showTimePicker = false
             },
-            hour,
-            minute,
-            true // 24 horas
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
         ).show()
     }
+
+    // Multimedia Picker Dialog
     if (showMultimediaPicker) {
         AlertDialog(
             onDismissRequest = { showMultimediaPicker = false },
-            title = { Text("Seleccionar Multimedia") },
+            title = { Text("Select Multimedia") },
             text = {
                 MultimediaPicker { selectedUris ->
-                    multimediaUris.value = selectedUris
-                    viewModel.updateMultimediaUris(selectedUris) // Actualizar en el ViewModel
+                    multimediaUris = selectedUris
+                    viewModel.updateMultimediaUris(selectedUris)
                 }
             },
             confirmButton = {
                 Button(onClick = { showMultimediaPicker = false }) {
-                    Text("Cerrar")
+                    Text("Close")
                 }
             }
         )
     }
 }
-
-
-

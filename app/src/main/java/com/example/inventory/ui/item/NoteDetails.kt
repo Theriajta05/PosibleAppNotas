@@ -5,24 +5,26 @@ data class NoteDetails(
     val id: Int = 0,
     val title: String = "",
     val content: String = "",
-    val multimediaUris: List<String> = listOf() // Nuevo campo para URIs
-
-){
-    // Método para verificar si la entrada es válida
+    val fecha: Long = 0L, // Timestamp para la fecha
+    val hora: Long = 0L,  // Timestamp para la hora
+    val multimediaUris: List<String> = listOf()
+) {
     fun isEntryValid(): Boolean {
         return title.isNotBlank() && content.isNotBlank()
     }
 }
-
-// Convierte un objeto `NoteDetails` a `Note`.
 fun NoteDetails.toNote(): Note = Note(
     id = id,
     title = title,
-    content = content
+    content = content,
+    fecha = fecha,
+    hora = hora
 )
-// Agrega esto en algún lugar accesible (por ejemplo, en Note.kt o NoteDetails.kt)
+
 fun Note.toNoteDetails(): NoteDetails = NoteDetails(
     id = id,
     title = title,
-    content = content
+    content = content,
+    fecha = fecha,
+    hora = hora
 )
