@@ -29,7 +29,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.ad_coding.noteappcourse.componentes.MultimediaPicker
 import com.example.inventory.InventoryTopAppBar
-import com.example.inventory.R
 import com.example.inventory.ui.AppViewModelProvider
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -46,6 +45,8 @@ fun NoteEntryScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showMultimediaPicker by remember { mutableStateOf(false) }
+    var showCameraDialog by remember { mutableStateOf(false) }
+    var showAudioRecorderDialog by remember { mutableStateOf(false) }
     var multimediaUris by remember { mutableStateOf<List<String>>(listOf()) }
 
     Scaffold(
@@ -64,7 +65,7 @@ fun NoteEntryScreen(
             ) {
                 // Title Input
                 OutlinedTextField(
-                    value = noteUiState.noteDetails?.title.orEmpty(), // Manejo de valores nulos
+                    value = noteUiState.noteDetails?.title.orEmpty(),
                     onValueChange = { viewModel.updateTitle(it) },
                     label = { Text("Title") },
                     modifier = Modifier
@@ -74,7 +75,7 @@ fun NoteEntryScreen(
 
                 // Content Input
                 OutlinedTextField(
-                    value = noteUiState.noteDetails?.content.orEmpty(), // Manejo de valores nulos
+                    value = noteUiState.noteDetails?.content.orEmpty(),
                     onValueChange = { viewModel.updateContent(it) },
                     label = { Text("Content") },
                     modifier = Modifier
@@ -113,6 +114,22 @@ fun NoteEntryScreen(
                     }",
                     modifier = Modifier.padding(start = 16.dp)
                 )
+
+                // Camera Button
+                Button(
+                    onClick = { showCameraDialog = true },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("Open Camera")
+                }
+
+                // Audio Recorder Button
+                Button(
+                    onClick = { showAudioRecorderDialog = true },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("Record Audio")
+                }
 
                 // Add Multimedia
                 Button(
@@ -203,6 +220,38 @@ fun NoteEntryScreen(
             },
             confirmButton = {
                 Button(onClick = { showMultimediaPicker = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
+    // Camera Dialog
+    if (showCameraDialog) {
+        AlertDialog(
+            onDismissRequest = { showCameraDialog = false },
+            title = { Text("Camera") },
+            text = {
+                CameraButton()
+            },
+            confirmButton = {
+                Button(onClick = { showCameraDialog = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
+    // Audio Recorder Dialog
+    if (showAudioRecorderDialog) {
+        AlertDialog(
+            onDismissRequest = { showAudioRecorderDialog = false },
+            title = { Text("Audio Recorder") },
+            text = {
+                AudioRecorderButton()
+            },
+            confirmButton = {
+                Button(onClick = { showAudioRecorderDialog = false }) {
                     Text("Close")
                 }
             }
