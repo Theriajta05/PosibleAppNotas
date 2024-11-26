@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import java.io.File
-// comentario borar esto
+// comentario borar esto, nuevo jsjsjs
 @Composable
 fun AudioRecorderButton() {
     val context = LocalContext.current
