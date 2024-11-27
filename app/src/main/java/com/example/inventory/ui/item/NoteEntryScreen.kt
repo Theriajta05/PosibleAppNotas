@@ -12,8 +12,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -47,11 +51,12 @@ fun NoteEntryScreen(
     var showCameraDialog by remember { mutableStateOf(false) }
     var showAudioRecorderDialog by remember { mutableStateOf(false) }
     var multimediaUris by remember { mutableStateOf<List<String>>(listOf()) }
+    var isReminderView by remember { mutableStateOf(false) } // Estado del switch
 
     Scaffold(
         topBar = {
             InventoryTopAppBar(
-                title = "Add Note",
+                title = if (isReminderView) "Add Reminder" else "Add Note",
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -62,7 +67,29 @@ fun NoteEntryScreen(
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
             ) {
-                // Title Input
+                // Botón deslizante (Switch)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (isReminderView) "Recordatorios" else "Notas",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Switch(
+                        checked = isReminderView,
+                        onCheckedChange = { isReminderView = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    )
+                }
+
+                // Título
                 OutlinedTextField(
                     value = noteUiState.noteDetails?.title.orEmpty(),
                     onValueChange = { viewModel.updateTitle(it) },
@@ -72,92 +99,96 @@ fun NoteEntryScreen(
                         .fillMaxWidth()
                 )
 
-                // Content Input
+                // Descripción
                 OutlinedTextField(
                     value = noteUiState.noteDetails?.content.orEmpty(),
                     onValueChange = { viewModel.updateContent(it) },
-                    label = { Text("Content") },
+                    label = { Text("Description") },
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
                 )
 
-                // Select Date
-                Button(
-                    onClick = { showDatePicker = true },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Select Date")
-                }
-                Text(
-                    text = "Selected Date: ${
-                        noteUiState.noteDetails?.fecha?.takeIf { it != 0L }?.let {
-                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
-                        } ?: "Not selected"
-                    }",
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                // Mostrar campos adicionales si está en "Recordatorios"
+                if (isReminderView) {
+                    // Seleccionar Fecha
+                    Button(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Select Date")
+                    }
+                    Text(
+                        text = "Selected Date: ${
+                            noteUiState.noteDetails?.fecha?.takeIf { it != 0L }?.let {
+                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
+                            } ?: "Not selected"
+                        }",
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
 
-                // Select Time
-                Button(
-                    onClick = { showTimePicker = true },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Select Time")
-                }
-                Text(
-                    text = "Selected Time: ${
-                        noteUiState.noteDetails?.hora?.takeIf { it != 0L }?.let {
-                            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(it))
-                        } ?: "Not selected"
-                    }",
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                    // Seleccionar Hora
+                    Button(
+                        onClick = { showTimePicker = true },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Select Time")
+                    }
+                    Text(
+                        text = "Selected Time: ${
+                            noteUiState.noteDetails?.hora?.takeIf { it != 0L }?.let {
+                                SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(it))
+                            } ?: "Not selected"
+                        }",
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
 
-                // Camera Button
-                Button(
-                    onClick = { showCameraDialog = true },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Open Camera")
-                }
+                    // Botón de cámara
+                    Button(
+                        onClick = { showCameraDialog = true },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Open Camera")
+                    }
 
-                // Audio Recorder Button
-                Button(
-                    onClick = { showAudioRecorderDialog = true },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Record Audio")
-                }
+                    // Botón de grabar audio
+                    Button(
+                        onClick = { showAudioRecorderDialog = true },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Record Audio")
+                    }
 
-                // Add Multimedia
-                Button(
-                    onClick = { showMultimediaPicker = true },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Add Multimedia")
-                }
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .height(150.dp)
-                ) {
-                    items(multimediaUris) { uri ->
-                        Image(
-                            painter = rememberAsyncImagePainter(model = Uri.parse(uri)),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .width(100.dp)
-                                .height(150.dp)
-                        )
+                    // Multimedia
+                    Button(
+                        onClick = { showMultimediaPicker = true },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Add Multimedia")
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .height(150.dp)
+                    ) {
+                        items(multimediaUris) { uri ->
+                            Image(
+                                painter = rememberAsyncImagePainter(model = Uri.parse(uri)),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .width(100.dp)
+                                    .height(150.dp)
+                            )
+                        }
                     }
                 }
 
-                // Save Button
+                // Guardar
                 Button(
                     onClick = {
-                        viewModel.saveNote()
+                        viewModel.saveNote(isReminderView)
                         navigateBack()
                     },
                     enabled = noteUiState.isEntryValid,
@@ -165,13 +196,13 @@ fun NoteEntryScreen(
                         .padding(16.dp)
                         .fillMaxWidth()
                 ) {
-                    Text("Save Note")
+                    Text("Save ${if (isReminderView) "Reminder" else "Note"}")
                 }
             }
         }
     )
 
-    // Date Picker Dialog
+    // Dialogs
     if (showDatePicker) {
         val context = LocalContext.current
         val calendar = Calendar.getInstance()
@@ -188,7 +219,6 @@ fun NoteEntryScreen(
         ).show()
     }
 
-    // Time Picker Dialog
     if (showTimePicker) {
         val context = LocalContext.current
         val calendar = Calendar.getInstance()
@@ -206,7 +236,6 @@ fun NoteEntryScreen(
         ).show()
     }
 
-    // Multimedia Picker Dialog
     if (showMultimediaPicker) {
         AlertDialog(
             onDismissRequest = { showMultimediaPicker = false },
@@ -225,7 +254,6 @@ fun NoteEntryScreen(
         )
     }
 
-    // Camera Dialog
     if (showCameraDialog) {
         AlertDialog(
             onDismissRequest = { showCameraDialog = false },
@@ -241,7 +269,6 @@ fun NoteEntryScreen(
         )
     }
 
-    // Audio Recorder Dialog
     if (showAudioRecorderDialog) {
         AlertDialog(
             onDismissRequest = { showAudioRecorderDialog = false },

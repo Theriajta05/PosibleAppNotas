@@ -48,21 +48,52 @@ fun NotesScreen(
     viewModel: NotesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val notesUiState by viewModel.notesUiState.collectAsState()
+    var isReminderView by remember { mutableStateOf(false) } // Controla el estado del Switch
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(NotesDestination.titleRes)) },
+                title = {
+                    Text(if (isReminderView) "Recordatorios" else "Notas")
+                },
                 actions = {
-                    IconButton(onClick = navigateToNoteEntry) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_note))
+                    // Switch para alternar entre Notas y Recordatorios
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
+                        Text(
+                            text = if (isReminderView) "Recordatorios" else "Notas",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Switch(
+                            checked = isReminderView,
+                            onCheckedChange = { isReminderView = it }
+                        )
+                    }
+
+                    // Botón para agregar una nueva nota o recordatorio
+                    IconButton(onClick = {
+                        navigateToNoteEntry()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Agregar ${if (isReminderView) "Recordatorio" else "Nota"}"
+                        )
                     }
                 }
             )
         }
     ) { padding ->
+        // Filtrar notas o recordatorios según el estado del Switch
+        val filteredNotes = if (isReminderView) {
+            notesUiState.notes.filter { it.fecha != 0L || it.hora != 0L } // Recordatorios
+        } else {
+            notesUiState.notes.filter { it.fecha == 0L && it.hora == 0L } // Notas
+        }
+
         NotesList(
-            notes = notesUiState.notes,
+            notes = filteredNotes,
             onNoteClick = navigateToNoteDetail,
             modifier = modifier.padding(padding)
         )
