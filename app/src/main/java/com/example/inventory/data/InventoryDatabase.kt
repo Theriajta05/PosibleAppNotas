@@ -5,13 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.migration.Migration
 import com.example.inventory.ui.item.Converters
 
-@Database(entities = [Note::class], version = 2, exportSchema = false)
-@TypeConverters(Converters::class) // Registrar los TypeConverters
+@Database(entities = [Note::class], version = 3, exportSchema = false)  // Aumenta la versión a 3
+@TypeConverters(Converters::class) // Registrar los TypeConverters si los necesitas
 abstract class InventoryDatabase : RoomDatabase() {
+
     abstract fun noteDao(): NoteDao
 
     companion object {
@@ -25,17 +26,10 @@ abstract class InventoryDatabase : RoomDatabase() {
                     InventoryDatabase::class.java,
                     "note_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()  // Usa migración destructiva para evitar problemas de migración
                     .build()
                 INSTANCE = instance
                 instance
-            }
-        }
-
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE notes ADD COLUMN fecha INTEGER DEFAULT 0 NOT NULL")
-                database.execSQL("ALTER TABLE notes ADD COLUMN hora INTEGER DEFAULT 0 NOT NULL")
             }
         }
     }
