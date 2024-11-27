@@ -5,14 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.inventory.ui.item.Converters
 
 @Database(entities = [Note::class], version = 3, exportSchema = false)  // Aumenta la versión a 3
-@TypeConverters(Converters::class) // Registrar los TypeConverters si los necesitas
+@TypeConverters(Converters::class) // Registrar los TypeConverters
 abstract class InventoryDatabase : RoomDatabase() {
-
     abstract fun noteDao(): NoteDao
 
     companion object {

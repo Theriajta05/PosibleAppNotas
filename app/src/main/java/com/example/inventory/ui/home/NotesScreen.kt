@@ -1,7 +1,12 @@
 // File: NotesScreen.kt
 package com.example.inventory.ui.notes
 
+import android.net.Uri
+import android.widget.VideoView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,14 +14,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.inventory.R
@@ -77,12 +85,49 @@ private fun NotesList(
 }
 
 @Composable
+fun PlaySavedVideo(videoUri: Uri, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            AndroidView(
+                factory = { context ->
+                    VideoView(context).apply {
+                        setVideoURI(videoUri)
+                        setOnPreparedListener { mediaPlayer ->
+                            mediaPlayer.start() // Inicia el video automáticamente
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Cerrar",
+                    tint = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun NoteItem(
     note: Note,
     onClick: () -> Unit
 ) {
     val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+    var selectedVideoUri by remember { mutableStateOf<Uri?>(null) }
 
     Card(
         modifier = Modifier
@@ -106,10 +151,9 @@ private fun NoteItem(
                 text = "Hora: ${timeFormatter.format(Date(note.hora))}",
                 style = MaterialTheme.typography.bodySmall
             )
-
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Mostrar imágenes y audios
+            // Mostrar multimedia
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -117,13 +161,10 @@ private fun NoteItem(
                 items(note.multimediaUris) { uri ->
                     when {
                         uri.endsWith(".jpg") || uri.endsWith(".png") -> {
-                            // Mostrar imagen
                             Image(
                                 painter = rememberAsyncImagePainter(model = uri),
                                 contentDescription = null,
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .padding(4.dp)
+                                modifier = Modifier.size(100.dp)
                             )
                         }
                         uri.endsWith(".mp3") || uri.endsWith(".wav") -> {
@@ -136,6 +177,14 @@ private fun NoteItem(
                                 Text("Reproducir")
                             }
                         }
+                        uri.endsWith(".mp4") -> {
+                            Button(
+                                onClick = { selectedVideoUri = Uri.parse(uri) },
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                Text("Reproducir Video")
+                            }
+                        }
                         else -> {
                             Text("Formato no soportado")
                         }
@@ -143,5 +192,13 @@ private fun NoteItem(
                 }
             }
         }
+    }
+
+    // Muestra el diálogo para reproducir video si un URI está seleccionado
+    selectedVideoUri?.let {
+        PlaySavedVideo(
+            videoUri = it,
+            onDismiss = { selectedVideoUri = null }
+        )
     }
 }

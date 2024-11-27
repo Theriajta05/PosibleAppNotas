@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.ad_coding.noteappcourse.componentes.MultimediaPicker
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.ui.AppViewModelProvider
 import java.text.SimpleDateFormat
