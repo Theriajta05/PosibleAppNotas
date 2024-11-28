@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -109,9 +110,9 @@ fun AudioRecorderButton() {
             }
         }) {
             if (isRecording) {
-                Icon(Icons.Filled.Home, contentDescription = "Detener Grabación", tint = Color.Red)
+                Icon(Icons.Filled.Done, contentDescription = "Detener Grabación", tint = Color.Red)
             } else {
-                Icon(Icons.Filled.Done, contentDescription = "Iniciar Grabación", tint = Color.Black)
+                Icon(Icons.Filled.PlayArrow, contentDescription = "Iniciar Grabación", tint = Color.Black)
             }
         }
 

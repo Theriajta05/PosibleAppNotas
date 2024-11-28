@@ -3,6 +3,7 @@ package com.example.inventory.ui.item
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,11 +17,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.outlined.AccountBox
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -57,6 +64,37 @@ fun CameraButton() {
         }
     }
 
+    var uri: Uri by remember { mutableStateOf(Uri.EMPTY) }
+
+    // tomar video INICIO --------------------------------------------------------------------------
+    var videoUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    var listVideoUri by remember {
+        mutableStateOf(listOf<Uri>())
+    }
+    var showVideo by remember {
+        mutableStateOf(false)
+    }
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo()
+    ) { success ->
+        if (success) {
+            uri.let {
+                listVideoUri = listVideoUri + it // Agrega la Uri a la lista
+            }
+            videoUri = uri
+            showVideo = !showVideo
+        }
+    }
+    if(showVideo){
+        DialogShowVideoTake(
+            onDismiss = { showVideo = !showVideo },
+            videoUri = videoUri
+        )
+    }
+
 
     Column {
         Button(onClick = {
@@ -73,6 +111,24 @@ fun CameraButton() {
             }
         }) {
             Icon(Icons.Filled.AccountBox, contentDescription = "Abrir cámara")
+            IconButton(
+                onClick = {
+                    uri = ComposeFileProvider.getImageUri(context)
+                    videoLauncher.launch(uri)
+                },
+                modifier = Modifier
+                    .width(75.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(imageVector = Icons.Outlined.PlayArrow, contentDescription = null)
+                    Text(
+                        text = "Video",
+                        style = typography.bodySmall
+                    )
+                }
+            }
         }
 
         LazyColumn(modifier = Modifier.height(150.dp)) {
