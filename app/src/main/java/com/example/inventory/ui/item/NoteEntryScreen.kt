@@ -142,8 +142,8 @@ fun NoteEntryScreen(
                         }",
                         modifier = Modifier.padding(start = 16.dp)
                     )
-
-                    // Botón de cámara
+                } else {
+                    // Botón de cámara (Solo en "Notas")
                     Button(
                         onClick = { showCameraDialog = true },
                         modifier = Modifier.padding(16.dp)
@@ -151,7 +151,7 @@ fun NoteEntryScreen(
                         Text("Open Camera")
                     }
 
-                    // Botón de grabar audio
+                    // Botón de grabar audio (Solo en "Notas")
                     Button(
                         onClick = { showAudioRecorderDialog = true },
                         modifier = Modifier.padding(16.dp)
@@ -159,7 +159,7 @@ fun NoteEntryScreen(
                         Text("Record Audio")
                     }
 
-                    // Multimedia
+                    // Multimedia (Solo en "Notas")
                     Button(
                         onClick = { showMultimediaPicker = true },
                         modifier = Modifier.padding(16.dp)
@@ -185,7 +185,7 @@ fun NoteEntryScreen(
                     }
                 }
 
-                // Guardar
+                // Botón Guardar
                 Button(
                     onClick = {
                         viewModel.saveNote(isReminderView)

@@ -1,7 +1,11 @@
 // File: NotesScreen.kt
 package com.example.inventory.ui.notes
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,14 +30,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import coil.compose.rememberAsyncImagePainter
 import com.example.inventory.R
 import com.example.inventory.data.Note
 import com.example.inventory.ui.AppViewModelProvider
+import com.example.inventory.ui.item.NotificationWorker
 import com.example.inventory.ui.navigation.NavigationDestination
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 object NotesDestination : NavigationDestination {
     override val route = "notes"
@@ -47,6 +58,7 @@ fun NotesScreen(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val context = LocalContext.current
     val notesUiState by viewModel.notesUiState.collectAsState()
     var isReminderView by remember { mutableStateOf(false) } // Controla el estado del Switch
 
@@ -62,10 +74,6 @@ fun NotesScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 16.dp)
                     ) {
-                        Text(
-                            text = if (isReminderView) "Recordatorios" else "Notas",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
                         Switch(
                             checked = isReminderView,
                             onCheckedChange = { isReminderView = it }
@@ -114,6 +122,7 @@ private fun NotesList(
         }
     }
 }
+
 
 @Composable
 fun PlaySavedVideo(videoUri: Uri, onDismiss: () -> Unit) {
@@ -173,15 +182,24 @@ private fun NoteItem(
             Text(text = note.title, style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = note.content, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Fecha: ${dateFormatter.format(Date(note.fecha))}",
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = "Hora: ${timeFormatter.format(Date(note.hora))}",
-                style = MaterialTheme.typography.bodySmall
-            )
+
+            // Mostrar Fecha solo si es válida
+            if (note.fecha != 0L) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Fecha: ${dateFormatter.format(Date(note.fecha))}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            // Mostrar Hora solo si es válida
+            if (note.hora != 0L) {
+                Text(
+                    text = "Hora: ${timeFormatter.format(Date(note.hora))}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Mostrar multimedia
@@ -199,7 +217,6 @@ private fun NoteItem(
                             )
                         }
                         uri.endsWith(".mp3") || uri.endsWith(".wav") -> {
-                            // Mostrar botón para reproducir audio
                             Button(
                                 onClick = { /* Lógica para reproducir audio */ },
                                 modifier = Modifier
@@ -225,7 +242,7 @@ private fun NoteItem(
         }
     }
 
-    // Muestra el diálogo para reproducir video si un URI está seleccionado
+    // Mostrar diálogo para reproducir video si hay un URI seleccionado
     selectedVideoUri?.let {
         PlaySavedVideo(
             videoUri = it,

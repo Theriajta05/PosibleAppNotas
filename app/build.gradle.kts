@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.inventory"
@@ -79,7 +79,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("androidx.compose.material:material-icons-core-android:1.5.4")
 
-
-
-
+    //Notificaciones
+    //implementation ("androidx.core:core:2.2.0")
+    implementation ("androidx.work:work-runtime-ktx:2.10.0") // Si planeas usar WorkManager
+    implementation ("androidx.core:core-ktx:1.15.0") // Para las notificaciones
+    implementation ("androidx.appcompat:appcompat:1.6.1")
 }
