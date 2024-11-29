@@ -1,4 +1,3 @@
-// File: NotesScreen.kt
 package com.example.inventory.ui.notes
 
 import android.app.NotificationChannel
@@ -35,15 +34,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import coil.compose.rememberAsyncImagePainter
 import com.example.inventory.R
 import com.example.inventory.data.Note
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.item.NotificationWorker
 import com.example.inventory.ui.navigation.NavigationDestination
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
+import coil.compose.rememberAsyncImagePainter
+import androidx.work.workDataOf  // Para workDataOf
+import java.util.concurrent.TimeUnit  // Para TimeUnit
+
 
 object NotesDestination : NavigationDestination {
     override val route = "notes"
@@ -122,7 +122,6 @@ private fun NotesList(
         }
     }
 }
-
 
 @Composable
 fun PlaySavedVideo(videoUri: Uri, onDismiss: () -> Unit) {
@@ -248,5 +247,76 @@ private fun NoteItem(
             videoUri = it,
             onDismiss = { selectedVideoUri = null }
         )
+    }
+
+    // Programar notificación para la nota con fecha y hora
+    if (note.fecha != 0L && note.hora != 0L) {
+        scheduleReminder(note.fecha, note.hora, LocalContext.current)
+    }
+}
+
+fun scheduleReminder(fecha: Long, hora: Long, context: Context) {
+    val inputData = workDataOf(
+        "fecha" to fecha,
+        "hora" to hora
+    )
+
+    val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+        .setInitialDelay(calculateDelay(fecha, hora), TimeUnit.MILLISECONDS)
+        .setInputData(inputData)
+        .build()
+
+    // Usar WorkManager para programar la tarea
+    WorkManager.getInstance(context).enqueue(workRequest)
+}
+
+fun calculateDelay(fecha: Long, hora: Long): Long {
+    // Crear un calendario con la fecha y hora de la notificación
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = fecha
+    val horaCalendar = Calendar.getInstance()
+    horaCalendar.timeInMillis = hora
+
+    // Establecer la hora en el calendario de la notificación
+    calendar.set(Calendar.HOUR_OF_DAY, horaCalendar.get(Calendar.HOUR_OF_DAY))
+    calendar.set(Calendar.MINUTE, horaCalendar.get(Calendar.MINUTE))
+
+    // Calcular el delay en milisegundos hasta la notificación
+    val delay = calendar.timeInMillis - System.currentTimeMillis()
+    return if (delay < 0) 0 else delay
+}
+
+class NotificationWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : androidx.work.Worker(context, workerParams) {
+
+    override fun doWork(): Result {
+        // Obtener los parámetros de la notificación (fecha y hora)
+        val fecha = inputData.getLong("fecha", 0L)
+        val hora = inputData.getLong("hora", 0L)
+
+        // Programar la notificación
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "note_channel",
+                "Recordatorios de Notas",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(applicationContext, "note_channel")
+            .setContentTitle("Recordatorio de Nota")
+            .setContentText("Tienes un recordatorio para la nota programada.")
+            .setSmallIcon(R.drawable.ic_notification)
+            .build()
+
+        notificationManager.notify(1, notification)
+
+        return Result.success()
     }
 }

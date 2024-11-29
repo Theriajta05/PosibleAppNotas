@@ -13,6 +13,7 @@ data class NoteDetails(
         return title.isNotBlank() && content.isNotBlank()
     }
 }
+
 fun NoteDetails.toNote(): Note = Note(
     id = id,
     title = title,

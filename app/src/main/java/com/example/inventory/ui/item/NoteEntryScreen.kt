@@ -3,6 +3,7 @@ package com.example.inventory.ui.item
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -210,6 +211,7 @@ fun NoteEntryScreen(
             context,
             { _, year, month, day ->
                 calendar.set(year, month, day)
+                Log.d("NoteEntryScreen", "Selected date: ${calendar.timeInMillis}")
                 viewModel.updateFecha(calendar.timeInMillis)
                 showDatePicker = false
             },
@@ -227,6 +229,7 @@ fun NoteEntryScreen(
             { _, hour, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hour)
                 calendar.set(Calendar.MINUTE, minute)
+                Log.d("NoteEntryScreen", "Selected time: ${calendar.timeInMillis}")
                 viewModel.updateHora(calendar.timeInMillis)
                 showTimePicker = false
             },

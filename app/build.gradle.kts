@@ -8,6 +8,8 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
+
         applicationId = "com.example.inventory"
         minSdk = 24
         targetSdk = 34
@@ -72,16 +74,15 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
-    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.google.code.gson:gson:2.10.1")
-
     implementation ("com.google.android.exoplayer:exoplayer:2.15.1")
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("androidx.compose.material:material-icons-core-android:1.5.4")
 
     //Notificaciones
-    //implementation ("androidx.core:core:2.2.0")
-    implementation ("androidx.work:work-runtime-ktx:2.10.0") // Si planeas usar WorkManager
-    implementation ("androidx.core:core-ktx:1.15.0") // Para las notificaciones
-    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")  // WorkManager
+    implementation("androidx.core:core-ktx:1.15.0")          // Para las notificaciones
+    implementation("androidx.appcompat:appcompat:1.6.1")      // Para compatibilidad con ActionBar
+    implementation("io.coil-kt:coil-compose:2.3.0")  // Para cargar imágenes de manera eficiente en Compose
+
 }
